@@ -123,8 +123,9 @@ Mit `--crop` bezieht sich die Auflösung auf den zugeschnittenen Bereich, also a
 
 ## Beispiel
 - Original
-<img width="500" height="500" alt="d75f5341-70ce-4181-babe-dd826c26c6bc" src="https://github.com/user-attachments/assets/7dea20a3-5dc5-49e6-9e20-1614e3afb675" /> </br>
+<img width="500" height="600" alt="d75f5341-70ce-4181-babe-dd826c26c6bc" src="https://github.com/user-attachments/assets/7dea20a3-5dc5-49e6-9e20-1614e3afb675" />
+
 - Pixel Version
-<img width="500" height="500" alt="d75f5341-70ce-4181-babe-dd826c26c6bc_pxl" src="https://github.com/user-attachments/assets/9559fc3d-9164-4b2a-b91e-d31a63255d11" />
+<img width="500" height="600" alt="d75f5341-70ce-4181-babe-dd826c26c6bc_pxl" src="https://github.com/user-attachments/assets/9559fc3d-9164-4b2a-b91e-d31a63255d11" />
 
 
