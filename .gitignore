@@ -1,0 +1,20 @@
+# Build-Ergebnisse (entstehen mit `cargo build` neu)
+/target/
+
+# Fertige Programmdateien gehören in GitHub-Releases, nicht ins Repository
+*.exe
+*.pdb
+
+# Eigene Bilder: Ein- und Ausgaben, Referenzen
+/Ausgabe/
+/Referenzen/
+/Testdaten/
+
+# Editor / System
+.vscode/
+.idea/
+.claude/
+*.swp
+Thumbs.db
+Desktop.ini
+.DS_Store

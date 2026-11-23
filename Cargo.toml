@@ -1,0 +1,38 @@
+[package]
+name = "image-to-pxl"
+version = "0.2.0"
+edition = "2021"
+description = "Wandelt Bilder in Pixel-Art um"
+license = "MIT"
+readme = "README.md"
+
+[lib]
+name = "image_to_pxl"
+path = "src/lib.rs"
+
+[[bin]]
+name = "pxl"
+path = "src/main.rs"
+
+[[bin]]
+name = "pxl-gui"
+path = "src/gui.rs"
+
+[dependencies]
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp", "bmp", "ico"] }
+clap = { version = "4", features = ["derive"] }
+rayon = "1"
+anyhow = "1"
+eframe = "0.31"
+rfd = "0.15"
+
+[build-dependencies]
+winresource = "0.1"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+
+[profile.dev]
+opt-level = 2
