@@ -4,7 +4,22 @@ Rust-Programm mit GUI und Kommandozeile, das Bilder in Pixel-Art umwandelt (begr
 
 ## Download
 
-Fertige Windows-Programme gibt es unter **Releases** auf der rechten Seite dieser GitHub-Seite. `pxl-gui.exe` herunterladen und per Doppelklick starten, eine Installation ist nicht nötig.
+Fertige Programme gibt es unter **Releases** auf der rechten Seite dieser GitHub-Seite:
+
+| System | Datei | Start |
+|---|---|---|
+| Windows | `pxl-gui.exe` | Doppelklick. Bei der SmartScreen-Warnung „Weitere Informationen → Trotzdem ausführen“ wählen. |
+| macOS 11+ (Apple Silicon & Intel) | `Image-to-PXL-macOS.zip` | Entpacken und `Image to PXL.app` in „Programme“ ziehen. **Beim ersten Start: Rechtsklick → Öffnen → Öffnen.** Unter macOS 15 und neuer stattdessen: Systemeinstellungen → Datenschutz & Sicherheit → „Dennoch öffnen“. |
+| macOS, Kommandozeile | `pxl-cli-macOS.zip` | Entpacken, danach `./pxl --help` im Terminal |
+
+Die Mac-App ist nicht von Apple notarisiert, deshalb erscheint beim ersten Start die Sicherheitswarnung.
+
+### Releases erstellen (automatisch)
+
+Der Workflow [.github/workflows/release.yml](.github/workflows/release.yml) baut beide Plattformen auf GitHub-Rechnern:
+
+- **Release:** Ein Tag wie `v0.3.0` erzeugen und pushen, z. B. in GitHub Desktop über „History → Rechtsklick auf Commit → Create Tag…“ und danach „Push“. Der Workflow baut und hängt die Mac- und Windows-Dateien automatisch an das Release.
+- **Nur testen:** Auf GitHub unter **Actions → Build & Release → Run workflow** starten. Die Dateien liegen danach unten im Lauf unter „Artifacts“.
 
 ## Bauen
 
@@ -64,7 +79,7 @@ Im Bereich **Speichern** links unten:
   - an: Der Dateidialog startet im eingestellten Ordner.
   - aus: „Speichern“ legt die Datei sofort dort ab. Vorhandene Dateien werden nicht überschrieben, sondern bekommen `_2`, `_3` … angehängt.
 - Auch **Ordner verarbeiten…** nutzt diesen Speicherort.
-- Die Einstellungen bleiben nach dem Neustart erhalten. Sie liegen in `%APPDATA%\Image to PXL\einstellungen.txt`.
+- Die Einstellungen bleiben nach dem Neustart erhalten. Sie liegen in `%APPDATA%\Image to PXL\einstellungen.txt`, auf dem Mac in `~/Library/Application Support/Image to PXL/`.
 
 In der Kommandozeile wird der Zielordner mit `-o` angegeben.
 

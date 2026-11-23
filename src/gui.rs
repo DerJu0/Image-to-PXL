@@ -17,8 +17,16 @@ use std::time::{Duration, Instant};
 const DEBOUNCE: Duration = Duration::from_millis(150);
 const PREVIEW_MAX: u32 = 2048;
 
+/// Tastenkürzel-Bezeichnung je nach System (Strg unter Windows/Linux, Cmd auf dem Mac)
+const MOD_KEY: &str = if cfg!(target_os = "macos") { "Cmd" } else { "Strg" };
+
 /// Ohne Konsole wären Fehler unsichtbar – daher als Dialog anzeigen.
 fn show_error(msg: &str) {
+    eprintln!("{msg}");
+    // macOS erlaubt Dialoge nur aus dem Hauptthread
+    if cfg!(target_os = "macos") && std::thread::current().name() != Some("main") {
+        return;
+    }
     rfd::MessageDialog::new()
         .set_title("Image to PXL – Fehler")
         .set_description(msg)
@@ -184,7 +192,9 @@ enum SaveLoc {
     Folder,
 }
 
-/// Export-Einstellungen; werden dauerhaft in %APPDATA%\Image to PXL\einstellungen.txt gespeichert.
+/// Export-Einstellungen; werden dauerhaft gespeichert:
+/// Windows `%APPDATA%\Image to PXL\`, macOS `~/Library/Application Support/Image to PXL/`,
+/// Linux `~/.config/Image to PXL/`.
 #[derive(Clone, PartialEq, Debug)]
 struct Prefs {
     loc: SaveLoc,
@@ -203,7 +213,16 @@ impl Default for Prefs {
 
 impl Prefs {
     fn file() -> Option<PathBuf> {
-        std::env::var_os("APPDATA").map(|d| PathBuf::from(d).join("Image to PXL").join("einstellungen.txt"))
+        let base = if cfg!(windows) {
+            std::env::var_os("APPDATA").map(PathBuf::from)
+        } else if cfg!(target_os = "macos") {
+            std::env::var_os("HOME").map(|h| PathBuf::from(h).join("Library").join("Application Support"))
+        } else {
+            std::env::var_os("XDG_CONFIG_HOME")
+                .map(PathBuf::from)
+                .or_else(|| std::env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))
+        };
+        base.map(|d| d.join("Image to PXL").join("einstellungen.txt"))
     }
 
     fn load() -> Self {
@@ -664,9 +683,16 @@ impl App {
                     }
                 }
                 if let Some(d) = pr.dir.clone() {
-                    if ui.button("Im Explorer öffnen").clicked() {
+                    let (label, cmd) = if cfg!(windows) {
+                        ("Im Explorer öffnen", "explorer")
+                    } else if cfg!(target_os = "macos") {
+                        ("Im Finder öffnen", "open")
+                    } else {
+                        ("Ordner öffnen", "xdg-open")
+                    };
+                    if ui.button(label).clicked() {
                         let _ = std::fs::create_dir_all(&d);
-                        let _ = std::process::Command::new("explorer").arg(&d).spawn();
+                        let _ = std::process::Command::new(cmd).arg(&d).spawn();
                     }
                 }
             });
@@ -753,14 +779,14 @@ impl eframe::App for App {
         egui::TopBottomPanel::top("top").show(ctx, |ui| {
             ui.add_space(4.0);
             ui.horizontal(|ui| {
-                if ui.button("Bild öffnen…").on_hover_text("Strg+O").clicked() {
+                if ui.button("Bild öffnen…").on_hover_text(format!("{MOD_KEY}+O")).clicked() {
                     self.open_dialog(ctx);
                 }
                 let can_save = self.result.is_some() && !self.saving;
                 let hint = match self.prefs.target_dir(self.path.as_deref()) {
-                    Some(d) if !self.prefs.ask => format!("Strg+S – speichert direkt nach:\n{}", d.display()),
-                    Some(d) => format!("Strg+S – Dialog startet in:\n{}", d.display()),
-                    None => "Strg+S".into(),
+                    Some(d) if !self.prefs.ask => format!("{MOD_KEY}+S – speichert direkt nach:\n{}", d.display()),
+                    Some(d) => format!("{MOD_KEY}+S – Dialog startet in:\n{}", d.display()),
+                    None => format!("{MOD_KEY}+S"),
                 };
                 if ui.add_enabled(can_save, egui::Button::new("Speichern…")).on_hover_text(hint).clicked() {
                     self.save_dialog(ctx);

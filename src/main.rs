@@ -133,13 +133,15 @@ fn collect_inputs(inputs: &[PathBuf]) -> Result<Vec<PathBuf>> {
 
 /// Ohne Argumente (z. B. Doppelklick im Explorer) wird die GUI gestartet,
 /// statt dass sich nur kurz ein Konsolenfenster öffnet und wieder schließt.
+/// Nur unter Windows: Auf macOS/Linux wird ein Kommandozeilenprogramm im Terminal
+/// gestartet, dort ist die normale Hilfe-Ausgabe das erwartete Verhalten.
 fn launch_gui_if_no_args() {
-    if std::env::args_os().len() > 1 {
+    if !cfg!(windows) || std::env::args_os().len() > 1 {
         return;
     }
     let gui = std::env::current_exe()
         .ok()
-        .and_then(|p| p.parent().map(|d| d.join("pxl-gui.exe")))
+        .and_then(|p| p.parent().map(|d| d.join(format!("pxl-gui{}", std::env::consts::EXE_SUFFIX))))
         .filter(|p| p.is_file());
     if let Some(gui) = gui {
         if std::process::Command::new(&gui).spawn().is_ok() {
